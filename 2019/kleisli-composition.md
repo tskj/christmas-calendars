@@ -2,11 +2,7 @@
 
 The kleisli arrow is often written using the fishbone operator.
 
-```F#
-f >=> g
-```
-
-is the Kleisli composition of the functions `f` and `g` with the following abstract types.
+`f >=> g` is the Kleisli composition of the functions `f` and `g` with the following abstract types.
 
 ```elm
 f: a -> M b
@@ -61,6 +57,7 @@ This technique can be used to chain together many computations to
 produce a larger result.
 When thinking about lists this can be understood as modeling problems
 with many results such as finding roots, or maybe finding the possible
+next moves in a graph traversal problem.
 
 ## A real world example
 
@@ -71,7 +68,7 @@ An endpoint might look like
 ```F#
 let updateEvent id =
     getBody<Models.WriteModel>
-    >> Result.map (models.writeToDomain id)
+    >> Result.map models.writeToDomain
     >> Result.bind (Service.updateEvent id)
     >> Result.map commitTransaction
     >> Result.map models.domainToView
@@ -91,10 +88,10 @@ This seems like it will work, until you consider which functions needs use of th
 In addition, both `Service.updateEvent` and `commitTransaction` needs a reference to the database.
 The way we solve this is to consider `Service.updateEvent id` not as a function from the domain
 model to `Result<DomainModel>` but as a function from the domain model to `ctx -> Result<DomainModel>`.
-That is, a function which takes domain models and produce domain models and can fail but also needing a
+That is, a function which takes domain models and produce domain models and can fail but also needs a
 context.
-That might sound and indeed be confusing, but if you don't think too much about it kind of makes sense.
-Using Kleisli composition's closely related cousin the bind operator `>>=`, we can rewrite our function:[0]
+That might sound and indeed be confusing, but if you don't think too much about it, it kind of makes sense.
+Using Kleisli composition's closely related cousin the bind operator `>>=`, we can rewrite our function.[0]
 
 ```F#
 let updateEvent id =
@@ -106,8 +103,8 @@ let updateEvent id =
 ```
 
 It's a small change, but now our two functions can access the context.
-The way I think about is that this is regular composition of functions, but when you need the context
-object, you inject it using the bind operator instead of regular composition.
+The way I think about it, is that this is regular composition of functions,
+but when you need the context object, you inject it using the bind operator instead of regular composition.
 And that is all you need to know to use this pattern productively!
 
 ## Technicalities
@@ -134,7 +131,7 @@ f >=> g =
 It might be difficult to see the similarities between functions that produce lists of
 things and functions that produce functions which need contexts, but they are there.
 They have some similar properties and can be understood in the same way. And of course,
-if you don't need that, you don't have to think too much about it to be able to use
+if you don't need to, you don't have to think too much about it to be able to use
 composition operators such as the bind and Kleisli arrows effectively.
 
 [0]: It is well known that [monads don't compose](https://blog.tmorris.net/posts/monads-do-not-compose/),

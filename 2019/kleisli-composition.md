@@ -1,4 +1,4 @@
-#Kleisli composition
+# Kleisli composition
 
 The kleisli arrow is often written using the fishbone operator.
 

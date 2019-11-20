@@ -1,7 +1,13 @@
 # Kleisli composition
 
-The kleisli arrow is often written using the fishbone operator.
+In this article I would like to introduce you to two common composition operators
+and explain some of their utility, using first a made up example, and then an
+example from the real world. These operators are all about composing functions
+of slightly weird types. For while regular function composition combines functions
+of types `a -> b` and `b -> c`, these guys concern themselves with combining
+functions of types which don't naturally fit perfectly together.
 
+The Kleisli arrow is often written using the fishbone operator.
 `f >=> g` is the Kleisli composition of the functions `f` and `g` with the following abstract types.
 
 ```elm

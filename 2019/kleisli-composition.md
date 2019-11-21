@@ -112,6 +112,14 @@ This constructs a larger function using the regular `>>` function composition op
 The input for this function will be a `context` object which contains the body of the
 HTTP request as well as a reference to the database, which the `Service` uses.
 
+Let's break this down line for line.
+
+- **Line 1** getBody is a function which takes the context object and produces a `Result.Ok WriteModel` if it can, or a `Result.Error` if it can't.
+- **Line 2** `writeToDomain` is a function which takes a `WriteModel` and produces a `DomainModel`. In our case, this cannot fail, hence the need for `Result.map`. If it could fail, we would instead use `Result.bind`.
+- **Line 3** `Service.updateEvent id` is a function which takes a `DomainModel` and produces a `DomainModel`. In addition it needs a reference to the context object to produce the side effect we want, namely updating the database. This can also fail, which is why we need `Result.bind`.
+- **Line 4** `commitTransaction` takes any input it is give, let's call it `'a`, and the context object, and after commiting the transaction to the database, it will return its input `'a`. The reason it also returns its input is to pass it along the pipeline of functions
+- **Line 5** `domainToView` takes the `DomainModel` and produces a `ViewModel`.
+
 We use `Result.map` to handle errors along the way using the built-in `Result` type.
 For instance `getBody` might fail if the incomming JSON cannot be parsed as a `Models.WriteModel` type.
 The `Result.bind` function reveals that the `Service.updateEvent` function itself

@@ -65,6 +65,34 @@ When thinking about lists this can be understood as modeling problems
 with many results such as finding roots, or maybe finding the possible
 next moves in a graph traversal problem.
 
+## The Bind operator
+
+The bind operator is often written `>>=`.
+Instead of composing two functions like the Kleisli arrow, the bind
+operator combines a value `x` and a function `f`.
+As with the arrow, we can think about the types of `x >>= f`.
+
+```elm
+x: M a
+f: a -> M b
+x >>= f : M b
+```
+
+As an example, consider once again the square root function.
+If we would like to compute the square roots of several values,
+such as the numbers 4, 9 and 16, we might write
+
+```elm
+[4, 9, 16] >>= sqrt
+```
+
+which would evaluate to `[2, -2, 3, -3, 4, -4]`.
+
+The Kleisli arrow and bind operator are very similar.
+One way to think about it is that they _mean_ the same thing,
+but which one you use is a matter of practicality and the shape of
+the data you happen to have.
+
 ## A real world example
 
 At work we have recently been experimenting with using F# for a simple

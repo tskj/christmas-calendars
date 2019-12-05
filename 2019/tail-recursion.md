@@ -98,7 +98,7 @@ In this technique we write our functions in a tail recursive style, but instead 
 Then we wrap this in a loop which is responsible for calling it repeatedly, until the function signals it is done.
 We signal this by returning a special value, such as undefined, instead of the function, when we reach the base case.
 
-Here is an implementation of JS.
+Here is an implementation in JS.
 
 ```js
 const factorial = ([acc, n]) => {
@@ -110,17 +110,24 @@ const factorial = ([acc, n]) => {
 };
 
 const trampoline = f0 => x0 => {
-  var f1 = f0;
-  var x1 = x0;
-  while (f1 !== undefined) {
-    [f2, x2] = f1(x1);
-    f1 = f2;
-    x1 = x2;
+  let f = f0;
+  let x = x0;
+
+  while (f !== undefined) {
+    [f, x] = f(x);
   }
 
-  return x1;
+  return x;
 };
 
 const fact = trampoline(factorial);
-console.log(fact([1, 5]));
 ```
+
+`fact` can now be called with `[1, 6]` to evalueate the factorial of `6`.
+One thing to note about this example is the use of two-element lists to represent tuples.
+The return value of `factorial` is a tuple of the function reference (or undefined) and the a tuple of the parameters to the function.
+The parameters of the function is the accumulator and the current value to compute the factorial of.
+Notice also the destructuring of `f` and `x` in the while loop, which also re-assigns the variables of the same names.
+For every iteration of the loop `x` is the next set of parameters the function will be called with.
+When the loop is finished and the recursion done, the value of x is the final value of the computation,
+the logical return value of the recursive function.

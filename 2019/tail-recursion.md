@@ -6,6 +6,7 @@ Let's investigate how this works.
 
 But first we need to consider what recursion is and which functions are tail recursive and which are not.
 A function is said to be recursive if it is defined in terms of itself.
+Not only is recursion a natural and elegant solution for many problems, but in pure functional languages such as Elm and Haskell, there is simply no other way to express looping.
 As is customary when thinking about recursion, we will look at the factorial function.
 In mathematics we might see a definition such as `n! = n * (n-1) * ... * 2 * 1`.
 If the author cares to define the same function recursively you might see
@@ -53,7 +54,7 @@ Maybe this becomes more clear if we take a loot at the same two definitions re-w
 ```reasonml
 let factorial n =
     if (n == 0) {
-        n
+        return n
     }
     let rest = factorial (n-1)
     n * rest
@@ -62,7 +63,7 @@ let factorial n =
 ```reasonml
 let factorial acc n =
     if (n == 0) {
-        acc
+        return acc
     }
     let sofar = acc * n
     let next = n - 1
@@ -87,3 +88,39 @@ Here is a Clojure implementation.
 ```
 
 Again we see the same structure, only expressed using a different syntax.
+
+## Addendum
+
+In many popular languages such as Python and JavaScript there is no implementation mainstream implementation of the language which implements tail recursion, so even if you write your functions in a tail recursive style, it has no effect.
+
+We can however implement it ourselves if we want to do many and deep recursions, without blowing the stack, using a technique known as _trampolining_.
+In this technique we write our functions in a tail recursive style, but instead of evaluating our function recursively before returning, we instead return the function we want called and the argument we want to call it with.
+Then we wrap this in a loop which is responsible for calling it repeatedly, until the function signals it is done.
+We signal this by returning a special value, such as undefined, instead of the function, when we reach the base case.
+
+Here is an implementation of JS.
+
+```js
+const factorial = ([acc, n]) => {
+  if (n === 0) {
+    return [undefined, acc];
+  }
+
+  return [factorial, [acc * n, n - 1]];
+};
+
+const trampoline = f0 => x0 => {
+  var f1 = f0;
+  var x1 = x0;
+  while (f1 !== undefined) {
+    [f2, x2] = f1(x1);
+    f1 = f2;
+    x1 = x2;
+  }
+
+  return x1;
+};
+
+const fact = trampoline(factorial);
+console.log(fact([1, 5]));
+```

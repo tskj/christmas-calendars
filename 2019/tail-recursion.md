@@ -16,7 +16,7 @@ n! = n * (n-1)!    if n > 0
 n! = 1             if n = 0
 ```
 
-Notice how the definition is of two parts, a recursive part and a base-case part.
+Notice how the definition is made of two parts, a recursive part and a base-case part.
 This translates nicely to programming.
 In a functional language we might define the factorial function like the following.
 
@@ -49,7 +49,7 @@ This is what allows the compiler to replace the function call with a loop instru
 When it returns, all we do is return that answer.
 In which case we might as well return the answer directly.
 
-Maybe this becomes more clear if we take a loot at the same two definitions re-written more verbosely, using intermediary variable names and if statements, instead of the more terse mathematics-like syntax above.
+Maybe this becomes more clear if we take a look at the same two definitions re-written more verbosely, using intermediary variable names and if statements, instead of the more terse mathematics-like syntax above.
 
 ```reasonml
 let factorial n =
@@ -72,7 +72,7 @@ let factorial acc n =
 
 The important difference is that in the first definition there is more work to be done after the recursive call, namely the multiplication `n * rest`, while in the second definition all the work happens before.
 
-One way I like to think about this in a mutable way is that the last line `factorial sofar next` is an instruction to go back to the top of the function and binding `acc` to this new value `sofar` and `n` to `next`.
+One way I like to think about this in a mutable way is that the last line `factorial sofar next` is an instruction to go back to the top of the function and bind `acc` to this new value `sofar` and `n` to `next`.
 Whenever `n == 0` and it is time to break out of this looping recursion, we simply return the latest value of `acc` directly to the original caller of the factorial function.
 In fact, this is precisely how Clojure implements tail recursion.
 Instead of detecting it automatically, Clojure forces you to use a special syntax with the special keywords `loop` and `recur`.
@@ -91,11 +91,11 @@ Again we see the same structure, only expressed using a different syntax.
 
 ## Addendum
 
-In many popular languages such as Python and JavaScript there is no implementation mainstream implementation of the language which implements tail recursion, so even if you write your functions in a tail recursive style, it has no effect.
+In many popular languages such as Python and JavaScript there is no implementation of the language which implements tail recursion, so even if you write your functions in a tail recursive style, it has no effect.
 
 We can however implement it ourselves if we want to do many and deep recursions, without blowing the stack, using a technique known as _trampolining_.
 In this technique we write our functions in a tail recursive style, but instead of evaluating our function recursively before returning, we instead return the function we want called and the argument we want to call it with.
-Then we wrap this in a loop which is responsible for calling it repeatedly, until the function signals it is done.
+Then we wrap this in a loop which is responsible for calling it repeatedly, until the function signals that it is done.
 We signal this by returning a special value, such as undefined, instead of the function, when we reach the base case.
 
 Here is an implementation in JS.
@@ -125,9 +125,10 @@ const fact = trampoline(factorial);
 
 `fact` can now be called with `[1, 6]` to evalueate the factorial of `6`.
 One thing to note about this example is the use of two-element lists to represent tuples.
-The return value of `factorial` is a tuple of the function reference (or undefined) and the a tuple of the parameters to the function.
+The return value of `factorial` is a tuple of the function reference (or undefined) and a tuple of the parameters to the function.
 The parameters of the function is the accumulator and the current value to compute the factorial of.
+
 Notice also the destructuring of `f` and `x` in the while loop, which also re-assigns the variables of the same names.
-For every iteration of the loop `x` is the next set of parameters the function will be called with.
+For every iteration of the loop, `x` is the next set of parameters the function will be called with.
 When the loop is finished and the recursion done, the value of x is the final value of the computation,
 the logical return value of the recursive function.

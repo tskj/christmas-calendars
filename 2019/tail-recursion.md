@@ -1,7 +1,7 @@
 # Tail recursion
 
 Tail recursion is a special way of writing recursive functions such that a compiler can optimize the recursion away and implement the algorithm as a loop instead.
-This is not because loops are inherently faster, but because every function call generally incurs the cost of a new stack frame in which it executes, sometimes leading to the dreaded `stack overflow` - where the beloved site of the same name gets its name.
+This is not because loops are inherently faster, but because every function call generally incurs the cost of a new stack frame in which it executes, sometimes leading to the dreaded `stack overflow` - where the beloved site of the same name, gets its name.
 Let's investigate how this works.
 
 But first we need to consider what recursion is and which functions are tail recursive and which are not.
@@ -39,7 +39,7 @@ let factorial acc n =
     | n -> factorial (acc * n) (n-1)
 ```
 
-This definition is mostly the same, with the addition of a new variable `acc`, short for accumulator.
+This definition is mostly the same, with the addition of a new parameter `acc`, short for accumulator.
 Introducing an accumulator is often necessary to be able to rewrite a function to be tail recursive.
 Annoyingly, this version has to be called with an initial value of `acc=1`, so for instance `5!` would look like `factorial 1 5`.
 
@@ -54,10 +54,10 @@ Maybe this becomes more clear if we take a look at the same two definitions re-w
 ```reasonml
 let factorial n =
     if (n == 0) {
-        return n
+        return 1
     }
     let rest = factorial (n-1)
-    n * rest
+    return n * rest
 ```
 
 ```reasonml
@@ -67,13 +67,14 @@ let factorial acc n =
     }
     let sofar = acc * n
     let next = n - 1
-    factorial sofar next
+    return factorial sofar next
 ```
 
-The important difference is that in the first definition there is more work to be done after the recursive call, namely the multiplication `n * rest`, while in the second definition all the work happens before.
+The important difference is that in the first definition there is more work to be done after the recursive call, namely the multiplication `n * rest`, while in the second definition, all the work happens before.
 
-One way I like to think about this in a mutable way is that the last line `factorial sofar next` is an instruction to go back to the top of the function and bind `acc` to this new value `sofar` and `n` to `next`.
+One way I like to think about this, is in a mutable way. I think of the last line `factorial sofar next` as an instruction to go back to the top of the function and bind `acc` to this new value `sofar` and `n` to `next`.
 Whenever `n == 0` and it is time to break out of this looping recursion, we simply return the latest value of `acc` directly to the original caller of the factorial function.
+
 In fact, this is precisely how Clojure implements tail recursion.
 Instead of detecting it automatically, Clojure forces you to use a special syntax with the special keywords `loop` and `recur`.
 Here is a Clojure implementation.
@@ -123,7 +124,7 @@ const trampoline = f0 => x0 => {
 const fact = trampoline(factorial);
 ```
 
-`fact` can now be called with `[1, 6]` to evalueate the factorial of `6`.
+`fact` can now be called with `[1, 5]` to evalueate the factorial of `5`.
 One thing to note about this example is the use of two-element lists to represent tuples.
 The return value of `factorial` is a tuple of the function reference (or undefined) and a tuple of the parameters to the function.
 The parameters of the function is the accumulator and the current value to compute the factorial of.

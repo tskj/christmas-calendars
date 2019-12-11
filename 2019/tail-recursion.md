@@ -21,7 +21,7 @@ This translates nicely to programming.
 In a functional language we might define the factorial function like the following.
 
 ```F#
-let factorial n =
+let rec factorial n =
     match n with
     | 0 -> 1
     | n -> n * factorial (n-1)
@@ -33,7 +33,7 @@ This function is however not tail recursive, it is merely recursive.
 A slightly re-written version, which _is_ tail recursive, might look like the follwing.
 
 ```F#
-let factorial acc n =
+let rec factorial acc n =
     match n with
     | 0 -> acc
     | n -> factorial (acc * n) (n-1)
@@ -51,23 +51,23 @@ In which case we might as well return the answer directly.
 
 Maybe this becomes more clear if we take a look at the same two definitions re-written more verbosely, using intermediary variable names and if statements, instead of the more terse mathematics-like syntax above.
 
-```reasonml
-let factorial n =
-    if (n == 0) {
-        return 1
-    }
-    let rest = factorial (n-1)
-    return n * rest
+```F#
+let rec factorial n =
+    if n = 0
+    then 1
+    else
+      let rest = factorial (n-1)
+      n * rest
 ```
 
-```reasonml
-let factorial acc n =
-    if (n == 0) {
-        return acc
-    }
-    let sofar = acc * n
-    let next = n - 1
-    return factorial sofar next
+```F#
+let rec factorial acc n =
+    if n = 0
+    then acc
+    else
+      let sofar = acc * n
+      let next = n - 1
+      factorial sofar next
 ```
 
 The important difference is that in the first definition there is more work to be done after the recursive call, namely the multiplication `n * rest`, while in the second definition, all the work happens before.

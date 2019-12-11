@@ -90,7 +90,7 @@ Here is a Clojure implementation.
 
 Again we see the same structure, only expressed using a different syntax.
 
-## Addendum
+## Trampolining
 
 In many popular languages such as Python and JavaScript there is no implementation of the language which implements tail recursion, so even if you write your functions in a tail recursive style, it has no effect.
 
